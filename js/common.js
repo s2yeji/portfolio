@@ -1,8 +1,34 @@
+const hd = document.querySelector('header');
+const hdInner = hd.querySelector('.inner');
+const wrap = document.querySelector('.wrap');
+// const nav = document.querySelector('header nav');
+const box = document.querySelectorAll('main .box');
+const ft = document.querySelector('footer');
 const goTop = document.querySelector('.goTop');
 
-const hd = document.querySelector('header');
-const nav = document.querySelector('header nav');
-const box = document.querySelectorAll('main > .box');
+let ham = document.createElement('div');
+ham.classList.add('ham');
+ham.innerHTML = '<span></span><span></span><span></span>';
+hdInner.appendChild(ham);
+ham.addEventListener('click', (e) => {
+  const checkMenu = document.querySelector('.menu');
+  if (checkMenu) {
+    checkMenu.remove();
+    hd.classList.remove('on');
+    ham.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    return;
+  }
+
+  const menu = document.createElement('nav');
+  menu.classList.add('menu');
+  menu.innerHTML =
+    '<a href="#">intro</a><a href="#">introduce</a><a href="#">skills</a><a href="#">projects</a><a href="#">contact</a>';
+  wrap.appendChild(menu);
+  hd.classList.add('on');
+  ham.classList.add('active');
+  document.body.style.overflow = 'hidden';
+});
 
 goTop.addEventListener('click', (e) => {
   e.preventDefault();
@@ -13,6 +39,10 @@ goTop.addEventListener('click', (e) => {
 });
 
 window.addEventListener('scroll', (e) => {
+  // let documentHeight = document.documentElement.scrollHeight;
+  // let windowHeight = window.innerHeight;
+  // let scrollY = window.scrollY || window.pageYOffset;
+
   if (scrollY > 10) {
     goTop.classList.add('on');
     hd.classList.add('on');
@@ -21,55 +51,27 @@ window.addEventListener('scroll', (e) => {
     hd.classList.remove('on');
   }
 
-  box.forEach((box, idx) => {
-    if (window.scrollY >= box.offsetTop) {
-      nav.querySelector('a.on').classList.remove('on');
-      nav.querySelector(`a:nth-of-type(${idx + 1})`).classList.add('on');
-    }
-  });
+  // if (scrollY + windowHeight >= documentHeight) {
+  //   goTop.classList.remove('on');
+  // }
 });
 
-nav.addEventListener('click', (e) => {
-  if (e.target.tagName === 'A') {
-    e.preventDefault();
-    const idx = [...nav.children].indexOf(e.target);
-    const offsetTop = box[idx].offsetTop;
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth',
-    });
-  }
+ft.addEventListener('mouseenter', () => goTop.classList.remove('on'));
+ft.addEventListener('mouseleave', () => goTop.classList.add('on'));
+
+const cursor = document.createElement('div');
+cursor.classList.add('cursor');
+wrap.appendChild(cursor);
+let cursorInfo = cursor.getBoundingClientRect();
+document.addEventListener('mousemove', (e) => {
+  let x = e.pageX - cursorInfo.width / 2;
+  let y = e.pageY - cursorInfo.height / 2;
+  cursor.classList.add('move');
+  cursor.style.cssText = `transform: translate(${x}px, ${y}px);`;
 });
-
-box.forEach((item) => {
-  item.addEventListener('wheel', (e) => {
-    let delta = e.wheelDelta ? e.wheelDelta : -e.deltaY;
-    let prevEl = item.previousElementSibling;
-    let nextEl = item.nextElementSibling;
-    let moveTop;
-
-    // prevElm && prevElm.classList.contains('box')
-    // 이전 요소가 존재하며 그리고 (&& and) 이전 요소는 .box를 갖고 있는 경우
-    // 두 조건을 만족하는 경우에만 { 실행 영역 } 이 진행됨
-
-    if (delta > 0) {
-      if (prevEl && prevEl.classList.contains('box')) {
-        moveTop = prevEl.offsetTop;
-        console.log(moveTop);
-        window.scrollTo({
-          top: moveTop,
-          // behavior: 'smooth',
-        });
-      }
-    } else {
-      if (nextEl && nextEl.classList.contains('box')) {
-        moveTop = nextEl.offsetTop;
-        console.log(moveTop);
-        window.scrollTo({
-          top: moveTop,
-          // behavior: 'smooth',
-        });
-      }
-    }
-  });
+document.addEventListener('click', (e) => {
+  cursor.classList.add('effect');
+  setTimeout(() => {
+    cursor.classList.remove('effect');
+  }, 300);
 });
